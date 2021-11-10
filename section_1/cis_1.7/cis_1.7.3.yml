@@ -1,0 +1,16 @@
+{{ if .Vars.ubuntu18cis_level_1 }}
+  {{ if .Vars.ubuntu18cis_rule_1_7_3 }}
+file:
+  /etc/issue:
+    title: 1.7.3 | L1 | Ensure permissions on /etc/issue are configured
+    exists: true
+    owner: root
+    group: root
+    mode: '0644'
+    meta:
+      server: 1
+      workstation: 1
+      CIS_ID: 
+      - 1.7.3
+  {{ end }}
+{{ end }}

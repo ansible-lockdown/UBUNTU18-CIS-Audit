@@ -1,0 +1,13 @@
+{{ if .Vars.ubuntu18cis_level_1 }}
+  {{ if .Vars.ubuntu18cis_rule_1_5_3 }}
+package:
+  prelink:
+    title: 1.5.3 | L1 | Ensure prelink is disabled
+    installed: false
+    meta:
+      server: 1
+      workstation: 1
+      CIS_ID: 
+      - 1.5.3
+  {{ end }}
+{{ end }}
