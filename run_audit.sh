@@ -1,6 +1,9 @@
 # script to run audit while populating local host data
 # 13th Sept 2021 - Initial
-# 9th Nov - Added root user check - more posix compliant for multiple OS types
+# 9th Nov 2021 - Added root user check - more posix compliant for multiple OS types
+# 10 Dec 2021 - Enhanced so more linux OS agnostic, less input required
+#             - added vars options for bespoke vars file
+#             - Ability to run as script from remediation role increased consistency
 
 #!/bin/bash
 
@@ -21,28 +24,29 @@ Help()
    # Display Help
    echo "Script to run the goss audit"
    echo
-   echo "Syntax: $0 [-g|-h|-o|-v]"
+   echo "Syntax: $0 [-g|-o|-v|-h]"
    echo "options:"
-   echo "g     optional - Add a group that the server should be grouped with (default value = ungrouped)"
-   echo "o     optional - file to output audit data"
-   echo "v     optional - relative path to thevars file to load (default e.g. $AUDIT_CONTENT_LOCATION/RHEL7-$BENCHMARK/vars/$BENCHMARK.yml)"
-   echo "h     Print this Help."
+   echo "-g     optional - Add a group that the server should be grouped with (default value = ungrouped)"
+   echo "-o     optional - file to output audit data"
+   echo "-v     optional - relative path to thevars file to load (default e.g. $AUDIT_CONTENT_LOCATION/RHEL7-$BENCHMARK/vars/$BENCHMARK.yml)"
+   echo "-h     Print this Help."
    echo
 }
 
 
 ## option statement
 
-while getopts g:o:h:v option; do
+while getopts g:o:v:h option; do
    case "${option}" in
         g) GROUP=${OPTARG};;
         o) OUTFILE=${OPTARG};;
+        v) VARS_PATH=${OPTARG};;
         h) # display Help
            Help
            exit;;
-        v) VARS_PATH=${OPTARG};;
-        \?) # Invalid option
+        ?) # Invalid option
          echo "Error: Invalid option"
+         Help
          exit;;
   esac
 done
@@ -84,7 +88,7 @@ if [ -z "$VARS_PATH" ]; then
      export varfile_path=$audit_content_dir/$audit_vars
    else
    # Check -v exists fail if not
-   if [ -f "$VARS_PATH"]; then
+   if [ -f "$VARS_PATH" ]; then
      export varfile_path=$VARS_PATH
    else
      echo "passed option '-v' $VARS_PATH does not exist"
@@ -103,16 +107,10 @@ os_version=`grep "^VERSION_ID=" /etc/os-release | cut -d '"' -f2`
 os_hostname=`hostname`
 
 ## Set variable audit_out
-if [ -z "$OUTFILE" ]; then
+if [ -z $OUTFILE ]; then
   export audit_out=$AUDIT_CONTENT_LOCATION/audit_$os_hostname_$epoch.json
 else
-   # Check outfile exists fail if not
-   if [ -f "$OUTFILE" ]; then
-     export audit_out=$OUTFILE
-   else
-     echo "Passed option '-o' $OUTFILE does not exist"
-     exit 1
-   fi
+  export audit_out=$OUTFILE
 fi
 
 
@@ -147,11 +145,12 @@ else
    echo
 fi
 
+echo $audit_out
 
 ## Run commands
-echo "###########"
-echo "Audit Start"
-echo "###########"
+echo "#############"
+echo "Audit Started"
+echo "#############"
 echo
 $AUDIT_BIN -g $audit_content_dir/$AUDIT_FILE --vars $varfile_path  --vars-inline $audit_json_vars v -f json -o pretty > $audit_out
 
