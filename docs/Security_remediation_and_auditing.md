@@ -73,7 +73,8 @@ It can be run in two ways:
 
 # Setup auditing - Remediation
 
-By Default, this is not enabled but this can be simply setup and run.
+By Default, this is not enabled but this can be simply setup and run. This will set the system up for you and will utilise the same variables used in the remediation steps to also run the audit.
+When the audit is run, this calls the same script as the standalone method with the data populated based on the variables below.
 
 ## Requirements
 
@@ -238,7 +239,7 @@ The following requirements are needed OS independant
 
 - Super user or permissions to run privilege commands
   - Linux sudo can work
-  - Windows ability to run secuirty audits and query group or local policy.
+  - Windows ability to run security audits and query group or local policy.
 
 - goss binary appropriate for the OS
   - Linux
@@ -248,7 +249,7 @@ The following requirements are needed OS independant
     - [64bit_v0.3.16_exe](https://github.com/aelsabbahy/goss/releases/download/v0.3.16/goss-alpha-windows-amd64.exe)
     - [64bit_v0.3.16_sha256](https://github.com/aelsabbahy/goss/releases/download/v0.3.16/goss-alpha-windows-amd64.exe.sha256)
 
-### Defining the audit
+## Defining the audit
 
 Each script runs against a configures variables file found in the content location in
 
@@ -272,16 +273,19 @@ If more than one group this can be comma seperated
 
 The run_audit.sh script
 
+This is written that:
+
+- Uppercase variable are the only ones that should need changing
+- lowercase variables are the ones that are discovered or built from existing.
+
 script variables
 example:
 
 ```sh
-AUDIT_BIN=/usr/local/bin/goss
-AUDIT_FILE=goss.yml
-AUDIT_VARS=vars/${BENCHMARK}.yml
-AUDIT_CONTENT_LOCATION=/var/tmp
-AUDIT_CONTENT_VERSION=RHEL8-$BENCHMARK-Audit
-AUDIT_CONTENT_DIR=$AUDIT_CONTENT_LOCATION/$AUDIT_CONTENT_VERSION
+BENCHMARK=CIS  # Benchmark Name aligns to the audit
+AUDIT_BIN=/usr/local/bin/goss  # location of the goss executable
+AUDIT_FILE=goss.yml  # the default goss file used by the audit provided by the audit configuration
+AUDIT_CONTENT_LOCATION=/var/tmp  # Location of the audit configuration file as available to the OS
 ```
 
 script help
@@ -289,11 +293,12 @@ script help
 ```sh
 Script to run the goss audit
 
-Syntax:  ./run_audit.sh [-g|-o|-h]
+Syntax:  ./run_audit.sh [-g|-o|-v| -h]
 options:
--g     optional - Add a group that the server should be grouped with
--o     optional - file to output audit data
--h     Print this Help.
+  -g     optional - Add a group that the server should be grouped with (default value = ungrouped)
+  -o     optional - file to output audit data
+  -v     optional - relative path to thevars file to load (default e.g. $AUDIT_CONTENT_LOCATION/RHEL7-$BENCHMARK/vars/$BENCHMARK.yml)
+  -h     Print this Help.
 
 Other options can be assigned in the script itself
 ```
@@ -313,7 +318,6 @@ $AUDIT_CONTENT_DIR = "$AUDIT_CONTENT_LOCATION\$AUDIT_CONTENT_VERSION"
 ```
 
 script itself
-
 
 # Assistance
 
