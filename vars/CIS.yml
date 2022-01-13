@@ -1,12 +1,5 @@
-## metadata for benchmark
-ubuntu18cis_benchmark:
-  - "type: CIS"
-  - "version: '2.1.0'"
-  - "os: Ubuntu 18.04"
-#  - "epoch: {{ ansible_date_time.epoch }}" # To be populated via wrapper script using inline vars
-#  - "hostname: {{ ansible_hostname }}" # To be populated via wrapper script using inline vars
-
-ubuntu18cis_os_distribution: ubuntu
+## metadata for Audit benchmark
+benchmark_version: '2.1.0'
 
 #  timeout for each command to run where set - default = 10seconds/10000ms
 timeout_ms: 60000
